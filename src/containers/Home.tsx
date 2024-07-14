@@ -1,11 +1,27 @@
 import Card from "../components/Card.tsx";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "../app/store.ts";
+import {useEffect} from "react";
+import {getTodo} from "./FetchRedux/FetchSlice.ts";
 
-const Home = () => {
+const Home: React.FC = () => {
+
+    const dispatch = useDispatch<AppDispatch>();
+
+    const todos = useSelector((state: RootState) => state.todo.todo);
+    const loading = useSelector((state: RootState) => state.todo.loading);
+    const error = useSelector((state: RootState) => state.todo.error);
+
+    useEffect(() => {
+        dispatch(getTodo());
+    }, [dispatch]);
+
+
     return (
         <div>
             <div className="form-container-add">
                 <h2>Enter a task</h2>
-                <form className="form">
+                <form className="form" >
                     <input
                         className="form-input"
                         type="text"
@@ -19,7 +35,9 @@ const Home = () => {
                     <h1 style={{marginTop: '20px'}}>List what need to do</h1>
                 </div>
                 <div>
-                    <Card/>
+                    {!loading && !error && Object.values(todos).map(todo => (
+                        <Card key={todo.id} title={todo.title} completed={todo.completed} />
+                    ))}
                 </div>
             </div>
         </div>
