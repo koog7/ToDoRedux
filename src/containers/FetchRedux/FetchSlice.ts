@@ -1,5 +1,6 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import axiosAPI from "../../axios/AxiosAPI.ts";
+import {RootState} from "../../app/store.ts";
 
 interface Todo {
     id: number;
@@ -8,42 +9,59 @@ interface Todo {
 }
 
 interface TodoState {
-    todo: Todo[];
+    todos: Todo[];
     loading: boolean;
     error: boolean;
 }
 
 const initialState: TodoState = {
-    todo: [],
+    todos: [],
     loading: false,
     error: false,
 };
 
-export const getTodo = createAsyncThunk<Todo[]>('todos/fetchTodos', async () => {
-    const response = await axiosAPI.get<Todo[]>('https://jsonplaceholder.typicode.com/todos');
-    return response.data;
+export const getTodo = createAsyncThunk<Todo[], void, { state: RootState }>('todos/fetchTodos', async () => {
+    const response = await axiosAPI.get<Todo[]>('/todos.json');
+    return Object.values(response.data);
 });
+
+export const postTodo = createAsyncThunk<Todo, Todo>('todos/postTodos', async (newTodo) => {
+        console.log('line 31 newtodo' , newTodo)
+        const response = await axiosAPI.post<Todo>('/todos.json', newTodo);
+        return { ...newTodo, id: response.data.name };
+});
+
 export const todoSlice = createSlice({
     name: 'todo',
     initialState,
     reducers: {
-        addTodo: (state, action) => {
-            state.todo.push(action.payload);
+        addTodo: (state, action: PayloadAction<Todo>) => {
+            state.todos.push(action.payload);
         },
     },
     extraReducers: (builder) => {
         builder.addCase(getTodo.pending, (state: TodoState) => {
             state.loading = true;
             state.error = false;
-            console.log(state.loading , state.error)
         }).addCase(getTodo.fulfilled, (state: TodoState, action: PayloadAction<Todo[]>) => {
             state.loading = false;
-            state.todo = action.payload;
-            console.log(state.loading , state.todo)
+            state.todos = action.payload;
         }).addCase(getTodo.rejected, (state: TodoState) => {
             state.loading = false;
             state.error = true;
-            console.log(state.loading , state.error)
+        }).addCase(postTodo.pending, (state: TodoState) => {
+            state.loading = true;
+            state.error = false;
+        }).addCase(postTodo.fulfilled, (state: TodoState, action: PayloadAction<Todo>) => {
+            if (Array.isArray(state.todos)) {
+                state.todos.push(action.payload);
+            } else {
+                state.todos = [action.payload];
+            }
+            state.loading = false;
+        }).addCase(postTodo.rejected, (state: TodoState) => {
+            state.loading = false;
+            state.error = true;
         });
     },
 });
