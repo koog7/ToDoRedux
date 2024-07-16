@@ -19,8 +19,7 @@ const Home: React.FC = () => {
     const submitForm = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (title.trim() !== '') {
-            const newTodo = {id: Math.random(),title, completed: false };
-            console.log('newtodo home' ,newTodo)
+            const newTodo = {id: todos.id ,title, completed: false };
             dispatch(postTodo(newTodo));
             setTitle('');
         }
