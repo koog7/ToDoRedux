@@ -38,6 +38,15 @@ export const postTodo = createAsyncThunk<Todo, Todo>('todos/postTodos', async (n
     }
 });
 
+export const deleteTodo = createAsyncThunk<string, string, { state: RootState }>('todos/deleteTodo', async (id) => {
+    try {
+        await axiosAPI.delete(`/todos/${id}.json`);
+        return id;
+    }catch (error) {
+        console.error('Error:', error);
+    }
+});
+
 export const todoSlice = createSlice({
     name: 'todo',
     initialState,
@@ -70,6 +79,15 @@ export const todoSlice = createSlice({
             }
             state.loading = false;
         }).addCase(postTodo.rejected, (state: TodoState) => {
+            state.loading = false;
+            state.error = true;
+        }).addCase(deleteTodo.pending, (state: TodoState) => {
+            state.loading = true;
+            state.error = false;
+        }).addCase(deleteTodo.fulfilled, (state: TodoState, action: PayloadAction<string>) => {
+            state.loading = false;
+            state.todos = state.todos.filter(todo => todo.id !== action.payload);
+        }).addCase(deleteTodo.rejected, (state: TodoState) => {
             state.loading = false;
             state.error = true;
         });

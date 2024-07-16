@@ -1,7 +1,7 @@
 import {useState} from "react";
 import axiosAPI from "../axios/AxiosAPI.ts";
 import {useDispatch} from "react-redux";
-import {updateTodo} from "../containers/FetchRedux/FetchSlice.ts";
+import {deleteTodo, updateTodo} from "../containers/FetchRedux/FetchSlice.ts";
 
 interface Props {
     id: string;
@@ -16,9 +16,19 @@ const Card: React.FC<Props> = ({ id,title, completed}) => {
     const inputToggle = async () => {
         try {
             const updatedTodo = { id, title, completed: !isComplete };
-            await axiosAPI.put(`/todos/${id}.json`, updatedTodo);
-            setIsComplete(prev => !prev);
-            dispatch(updateTodo(updatedTodo));
+            if(id){
+                await axiosAPI.put(`/todos/${id}.json`, updatedTodo);
+                setIsComplete(prev => !prev);
+                dispatch(updateTodo(updatedTodo));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    const todoDelete = async () => {
+        try {
+            dispatch(deleteTodo(id));
         } catch (error) {
             console.error('Error:', error);
         }
@@ -37,7 +47,7 @@ const Card: React.FC<Props> = ({ id,title, completed}) => {
                 />
                 Completed?
             </label>
-            <button>Delete</button>
+            <button onClick={todoDelete}>Delete</button>
         </div>
     );
 };

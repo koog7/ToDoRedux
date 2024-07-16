@@ -28,6 +28,9 @@ const Home: React.FC = () => {
 
     return (
         <div>
+            {loading && <div id="loader-container">
+                <div className="loader"></div>
+            </div>}
             <div className="form-container-add">
                 <h2>Enter a task</h2>
                 <form className="form" onSubmit={submitForm}>
@@ -45,8 +48,9 @@ const Home: React.FC = () => {
                 <div style={{display: 'flex', justifyContent: 'space-between'}}>
                     <h1 style={{marginTop: '20px'}}>List what need to do</h1>
                 </div>
+                {!loading && !error && (!todos || todos.length === 0) && <p>Now task are empty</p>}
                 <div>
-                    {!loading && !error && Object.entries(todos).map(([id, todo]) => (
+                    {!loading && !error && todos && todos.length > 0 && Object.entries(todos).map(([id, todo]) => (
                         <Card key={id} id={todo.id} title={todo.title} completed={todo.completed} />
                     ))}
                 </div>
