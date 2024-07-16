@@ -3,7 +3,7 @@ import axiosAPI from "../../axios/AxiosAPI.ts";
 import {RootState} from "../../app/store.ts";
 
 interface Todo {
-    id: number;
+    id?: number | string;
     title: string;
     completed: boolean;
 }
@@ -21,22 +21,32 @@ const initialState: TodoState = {
 };
 
 export const getTodo = createAsyncThunk<Todo[], void, { state: RootState }>('todos/fetchTodos', async () => {
-    const response = await axiosAPI.get<Todo[]>('/todos.json');
-    return Object.values(response.data);
+    try{
+        const response = await axiosAPI.get<Todo[]>('/todos.json');
+        return Object.values(response.data);
+    }catch (error) {
+        console.error('Error:', error);
+    }
 });
 
 export const postTodo = createAsyncThunk<Todo, Todo>('todos/postTodos', async (newTodo) => {
-        console.log('line 31 newtodo' , newTodo)
+    try{
         const response = await axiosAPI.post<Todo>('/todos.json', newTodo);
         return { ...newTodo, id: response.data.name };
+    }catch (error) {
+        console.error('Error:', error);
+    }
 });
 
 export const todoSlice = createSlice({
     name: 'todo',
     initialState,
     reducers: {
-        addTodo: (state, action: PayloadAction<Todo>) => {
-            state.todos.push(action.payload);
+        updateTodo: (state, action: PayloadAction<Todo>) => {
+            const updatedTodo = action.payload;
+            if (state.todos[updatedTodo.id]) {
+                state.todos[updatedTodo.id] = updatedTodo;
+            }
         },
     },
     extraReducers: (builder) => {
@@ -67,4 +77,4 @@ export const todoSlice = createSlice({
 });
 
 export const ToDoReducer = todoSlice.reducer;
-export const  {addTodo}  = todoSlice.actions;
+export const  {updateTodo}  = todoSlice.actions;

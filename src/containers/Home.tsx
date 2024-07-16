@@ -19,7 +19,7 @@ const Home: React.FC = () => {
     const submitForm = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (title.trim() !== '') {
-            const newTodo = { id: Math.random(), title, completed: false };
+            const newTodo = { title, completed: false };
             console.log('newtodo home' ,newTodo)
             dispatch(postTodo(newTodo));
             setTitle('');
@@ -46,8 +46,8 @@ const Home: React.FC = () => {
                     <h1 style={{marginTop: '20px'}}>List what need to do</h1>
                 </div>
                 <div>
-                    {!loading && !error && Object.values(todos).map(todo => (
-                        <Card key={todo.id} title={todo.title} completed={todo.completed} />
+                    {!loading && !error && Object.entries(todos).map(([id, todo]) => (
+                        <Card key={id} id={todo.id} title={todo.title} completed={todo.completed} />
                     ))}
                 </div>
             </div>
