@@ -19,7 +19,7 @@ const Home: React.FC = () => {
     const submitForm = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (title.trim() !== '') {
-            const newTodo = { title, completed: false };
+            const newTodo = {id: Math.random(),title, completed: false };
             console.log('newtodo home' ,newTodo)
             dispatch(postTodo(newTodo));
             setTitle('');
@@ -43,6 +43,7 @@ const Home: React.FC = () => {
                     />
                     <button className="form-button" type="submit">Add</button>
                 </form>
+                {error && <p>Some error occurred</p>}
             </div>
             <div style={{display:'flex', flexDirection: 'column', placeItems:'center'}}>
                 <div style={{display: 'flex', justifyContent: 'space-between'}}>
