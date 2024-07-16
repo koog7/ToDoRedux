@@ -3,7 +3,7 @@ import axiosAPI from "../../axios/AxiosAPI.ts";
 import {RootState} from "../../app/store.ts";
 
 interface Todo {
-    id?: number | string;
+    id: number | string;
     title: string;
     completed: boolean;
 }
